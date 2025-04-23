@@ -14,7 +14,6 @@ import { Slider } from "@/components/ui/slider"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ThreatDetailsPanel } from "@/components/threat-details-panel"
 
 export function IOCsTable({ data }: { data: ThreatData }) {
   const [page, setPage] = useState(1)
@@ -353,7 +352,71 @@ export function IOCsTable({ data }: { data: ThreatData }) {
       )}
 
       {selectedIndicator ? (
-        <ThreatDetailsPanel indicator={selectedIndicator} onClose={() => setSelectedIndicator(undefined)} />
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-medium">Threat Details</h3>
+            <Button variant="ghost" size="sm" onClick={() => setSelectedIndicator(undefined)}>
+              Close
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="grid gap-2 md:grid-cols-2">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Indicator</p>
+                <p className="font-mono">{selectedIndicator.indicator}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Type</p>
+                <Badge variant="outline">{selectedIndicator.type}</Badge>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Threat Type</p>
+                <p>{selectedIndicator.threat_type}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Source</p>
+                <Badge variant="outline">{selectedIndicator.source}</Badge>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Country</p>
+                <Badge variant="outline">{selectedIndicator.country}</Badge>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Confidence</p>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-16 rounded-full bg-slate-200 dark:bg-slate-700">
+                    <div
+                      className={`h-full rounded-full ${
+                        selectedIndicator.confidence > 80
+                          ? "bg-red-500"
+                          : selectedIndicator.confidence > 50
+                            ? "bg-orange-500"
+                            : "bg-yellow-500"
+                      }`}
+                      style={{ width: `${selectedIndicator.confidence}%` }}
+                    />
+                  </div>
+                  <span>{selectedIndicator.confidence}%</span>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Timestamp</p>
+                <p>{new Date(selectedIndicator.timestamp).toLocaleString()}</p>
+              </div>
+            </div>
+
+            <div className="rounded-md bg-muted p-4">
+              <h4 className="mb-2 font-medium">Recommended Actions</h4>
+              <ul className="list-inside list-disc space-y-1 text-sm">
+                <li>Add to blocklist in firewall</li>
+                <li>Scan systems for this indicator</li>
+                <li>Check logs for previous occurrences</li>
+                <li>Share with security team</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       ) : (
         <Card className="border-none bg-gradient-to-br from-slate-800/80 to-slate-900/80 shadow-lg">
           <CardContent className="p-0">
@@ -385,7 +448,9 @@ export function IOCsTable({ data }: { data: ThreatData }) {
                         <Badge
                           variant="outline"
                           className={`font-normal ${
-                            indicator.source === "OTX" ? "bg-chart-1/10 text-chart-1" : "bg-chart-3/10 text-chart-3"
+                            indicator.source === "OTX"
+                              ? "bg-blue-500/10 text-blue-500"
+                              : "bg-green-500/10 text-green-500"
                           }`}
                         >
                           {indicator.source}
@@ -393,7 +458,7 @@ export function IOCsTable({ data }: { data: ThreatData }) {
                       </TableCell>
                       <TableCell className="text-xs">{new Date(indicator.timestamp).toLocaleString()}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-accent/10 font-normal text-accent">
+                        <Badge variant="outline" className="bg-purple-500/10 font-normal text-purple-500">
                           {indicator.country}
                         </Badge>
                       </TableCell>
@@ -403,10 +468,10 @@ export function IOCsTable({ data }: { data: ThreatData }) {
                             <div
                               className={`h-full rounded-full ${
                                 indicator.confidence > 80
-                                  ? "bg-threat-critical"
+                                  ? "bg-red-500"
                                   : indicator.confidence > 50
-                                    ? "bg-threat-high"
-                                    : "bg-chart-4"
+                                    ? "bg-orange-500"
+                                    : "bg-yellow-500"
                               }`}
                               style={{ width: `${indicator.confidence}%` }}
                             />
